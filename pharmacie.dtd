@@ -27,7 +27,7 @@
 <!ELEMENT Commande EMPTY>
 <!ATTLIST Commande
     ID_Commande ID #REQUIRED
-    Date CDATA #IMPLIED
+    Date CDATA #REQUIRED
     ID_Client IDREF #REQUIRED
     ID_Medicament IDREF #REQUIRED
 >
