@@ -1,0 +1,34 @@
+<!DOCTYPE Gestion_pharmacie [
+<!ELEMENT Gestion_pharmacie (Commande*, Medicament*, Client*, Fournisseur*)> 
+
+<!ELEMENT Client EMPTY>
+<!ATTLIST Client
+    ID_Client ID #REQUIRED
+    Nom_Client CDATA #REQUIRED
+    Telephone CDATA #IMPLIED
+>
+
+<!ELEMENT Fournisseur EMPTY>
+<!ATTLIST Fournisseur
+    ID_Fournisseur ID #REQUIRED
+    Nom_Fournisseur CDATA #REQUIRED
+    Telephone CDATA #IMPLIED
+>
+
+<!ELEMENT Medicament EMPTY>
+<!ATTLIST Medicament
+    ID_Medicament ID #REQUIRED
+    Nom_Medicament CDATA #REQUIRED
+    Prix CDATA #REQUIRED
+    Quantite_Stock CDATA #IMPLIED
+    ID_Fournisseur IDREF #REQUIRED
+>
+
+<!ELEMENT Commande EMPTY>
+<!ATTLIST Commande
+    ID_Commande ID #REQUIRED
+    Date CDATA #IMPLIED
+    ID_Client IDREF #REQUIRED
+    ID_Medicament IDREF #REQUIRED
+>
+]>

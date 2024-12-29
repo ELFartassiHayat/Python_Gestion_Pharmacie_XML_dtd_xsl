@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<?xml-stylesheet type="text/xsl" href="pharmacie.xsl"?>
+<pharmacie>
+    
+<Commande ID_Commande="2" Date="30/11/0" ID_Client="1" ID_Medicament="2" /><Commande ID_Commande="2" Date="30/11/2001" ID_Client="5" ID_Medicament="1" /><Client ID_Client="2" Nom_Client="aya" Telephone="5431" /><Client ID_Client="1" Nom_Client="jamila" Telephone="468545" /><Fournisseur ID_Fournisseur="5" Nom_Fournisseur="ahmed" Telephone="54534" /><Fournisseur ID_Fournisseur="aisa" Nom_Fournisseur="omar" Telephone="75" /><Medicament ID_Medicament="1" Nom_Medicament="paracitamol" Prix="30dh" Quantite_Stock="2" ID_Fournisseur="1" /></pharmacie>
