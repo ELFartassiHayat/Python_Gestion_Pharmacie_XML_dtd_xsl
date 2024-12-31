@@ -1,5 +1,5 @@
-<!DOCTYPE Gestion_pharmacie [
-<!ELEMENT Gestion_pharmacie (Commande*, Medicament*, Client*, Fournisseur*)> 
+<!DOCTYPE pharmacie [
+<!ELEMENT pharmacie (Commande*, Medicament*, Client*, Fournisseur*)> 
 
 <!ELEMENT Client EMPTY>
 <!ATTLIST Client
@@ -20,7 +20,7 @@
     ID_Medicament ID #REQUIRED
     Nom_Medicament CDATA #REQUIRED
     Prix CDATA #REQUIRED
-    Quantite_Stock CDATA #IMPLIED
+    Quantite_Stock CDATA #REQUIRED
     ID_Fournisseur IDREF #REQUIRED
 >
 
@@ -30,5 +30,5 @@
     Date CDATA #REQUIRED
     ID_Client IDREF #REQUIRED
     ID_Medicament IDREF #REQUIRED
->
+> 
 ]>

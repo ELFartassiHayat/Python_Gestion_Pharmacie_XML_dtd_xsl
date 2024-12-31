@@ -1,11 +1,8 @@
-import os
 import xml.etree.ElementTree as ET
-
-#!!!!  il faut ajouter ce ligne au fichier pharmacy.xml  !!!!!  <?xml-stylesheet type="text/xsl" href="pharmacie.xsl"?>
+import os
 
 FILENAME = "pharmacie.xml"
 
-# Charger et sauvegarder le fichier XML
 
 def charger_donnees():
     tree = ET.parse(FILENAME)
@@ -13,25 +10,37 @@ def charger_donnees():
     return tree, root
 
 def sauvegarder_donnees(tree):
-    tree.write(FILENAME, encoding='utf-8', xml_declaration=True)
+    stylesheet = '<?xml-stylesheet type="text/xsl" href="pharmacie.xsl"?>'
+    xml_data = ET.tostring(tree.getroot(), encoding='utf-8').decode('utf-8')
+    with open(FILENAME, 'w', encoding='utf-8') as file:
+        file.write('<?xml version="1.0" encoding="utf-8"?>\n')
+        file.write(stylesheet + '\n')
+        file.write(xml_data)
 
 def existe_entite(root, tag, attribute, value):
     for entity in root.findall(tag):
-        if entity.get(attribute) == value:
-            return entity  # Return the actual element instead of True
-    return None  # Return None if not found
+        if str(entity.get(attribute)).strip() == str(value).strip():
+           return entity
+    return None
 
+
+def init_xml_file(fichier_xml):
+    if not os.path.exists(fichier_xml):
+        root = ET.Element('pharmacie')
+        tree = ET.ElementTree(root)
+        tree.write(fichier_xml)
+        print(f"Fichier {fichier_xml} créé avec succès.")
 
 # === Gestion des Clients ===
 def ajouter_client():
     tree, root = charger_donnees()
     id_client = input("Entrez l'ID du client : ")
-    if existe_entite(root, "Client", "ID_Client", id_client):
+    if existe_entite(root, "Client", "ID_Client", id_client) is not None:
         print("Un client avec cet ID existe déjà.")
         return
     nom_client = input("Entrez le nom du client : ")
     telephone = input("Entrez le téléphone (facultatif) : ")
-    ET.SubElement(root, "Client", {
+    ET.SubElement(root,"Client", {
         "ID_Client": id_client,
         "Nom_Client": nom_client,
         "Telephone": telephone
@@ -48,15 +57,16 @@ def afficher_clients():
 def supprimer_client():
     tree, root = charger_donnees()
     id_client = input("Entrez l'ID du client à supprimer : ")
-    client_to_remove = None
-    for client in root.findall("Client"):
-        if client.get("ID_Client") == id_client:
-            client_to_remove = client
-            break
+    client_to_remove = existe_entite(root, "Client", "ID_Client", id_client)
     if client_to_remove is not None:
+        # Remove related commandes
+        commandes_to_remove = [cmd for cmd in root.findall("Commande") if cmd.get("ID_Client") == id_client]
+        for commande in commandes_to_remove:
+            root.remove(commande)
+
         root.remove(client_to_remove)
         sauvegarder_donnees(tree)
-        print("Client supprimé avec succès !")
+        print("Client et ses commandes associées supprimés avec succès !")
     else:
         print("Client non trouvé.")
 
@@ -78,7 +88,7 @@ def mettre_a_jour_client():
 def ajouter_fournisseur():
     tree, root = charger_donnees()
     id_fournisseur = input("Entrez l'ID du fournisseur : ")
-    if existe_entite(root, "Fournisseur", "ID_Fournisseur", id_fournisseur):
+    if existe_entite(root, "Fournisseur", "ID_Fournisseur", id_fournisseur) is not None:
         print("Un fournisseur avec cet ID existe déjà.")
         return
     nom_fournisseur = input("Entrez le nom du fournisseur : ")
@@ -100,15 +110,19 @@ def afficher_fournisseurs():
 def supprimer_fournisseur():
     tree, root = charger_donnees()
     id_fournisseur = input("Entrez l'ID du fournisseur à supprimer : ")
-    fournisseur_to_remove = None
-    for fournisseur in root.findall("Fournisseur"):
-        if fournisseur.get("ID_Fournisseur") == id_fournisseur:
-            fournisseur_to_remove = fournisseur
-            break
+    fournisseur_to_remove = existe_entite(root, "Fournisseur", "ID_Fournisseur", id_fournisseur)
     if fournisseur_to_remove is not None:
+        # Remove related medicaments
+        medicaments_to_remove = [med for med in root.findall("Medicament") if med.get("ID_Fournisseur") == id_fournisseur]
+        for medicament in medicaments_to_remove:
+            # Also remove commandes linked to these medicaments
+            commandes_to_remove = [cmd for cmd in root.findall("Commande") if cmd.get("ID_Medicament") == medicament.get("ID_Medicament")]
+            for commande in commandes_to_remove:
+                root.remove(commande)
+            root.remove(medicament)
         root.remove(fournisseur_to_remove)
         sauvegarder_donnees(tree)
-        print("Fournisseur supprimé avec succès !")
+        print("Fournisseur, ses médicaments et commandes associées supprimés avec succès !")
     else:
         print("Fournisseur non trouvé.")
 
@@ -130,20 +144,29 @@ def mettre_a_jour_fournisseur():
 def ajouter_medicament():
     tree, root = charger_donnees()
     id_medicament = input("Entrez l'ID du médicament : ")
-    if existe_entite(root, "Medicament", "ID_Medicament", id_medicament):
+    if existe_entite(root, "Medicament", "ID_Medicament", id_medicament) is not None:
         print("Un médicament avec cet ID existe déjà.")
         return
+
+    id_fournisseur = input("Entrez l'ID du fournisseur : ").strip()
+    if existe_entite(root, "Fournisseur", "ID_Fournisseur", id_fournisseur) is None:
+        print("Le fournisseur avec cet ID n'existe pas. Veuillez d'abord l'ajouter.")
+        return
+
     nom_medicament = input("Entrez le nom du médicament : ")
     prix = input("Entrez le prix : ")
-    quantite = input("Entrez le quantite : ")
+    quantite = input("Entrez la quantité : ")
+    
     ET.SubElement(root, "Medicament", {
         "ID_Medicament": id_medicament,
         "Nom_Medicament": nom_medicament,
         "Prix": prix,
-        "Quantite_Stock": quantite
+        "Quantite_Stock": quantite,
+        "ID_Fournisseur": id_fournisseur
     })
     sauvegarder_donnees(tree)
     print("Médicament ajouté avec succès !")
+
     
 def afficher_medicaments():
     _, root = charger_donnees()
@@ -154,15 +177,15 @@ def afficher_medicaments():
 def supprimer_medicament():
     tree, root = charger_donnees()
     id_medicament = input("Entrez l'ID du médicament à supprimer : ")
-    medicament_to_remove = None
-    for medicament in root.findall("Medicament"):
-        if medicament.get("ID_Medicament") == id_medicament:
-            medicament_to_remove = medicament
-            break
+    medicament_to_remove = existe_entite(root, "Medicament", "ID_Medicament", id_medicament)
     if medicament_to_remove is not None:
+        # Remove related commandes
+        commandes_to_remove = [cmd for cmd in root.findall("Commande") if cmd.get("ID_Medicament") == id_medicament]
+        for commande in commandes_to_remove:
+            root.remove(commande)
         root.remove(medicament_to_remove)
         sauvegarder_donnees(tree)
-        print("Médicament supprimé avec succès !")
+        print("Médicament et ses commandes associées supprimés avec succès !")
     else:
         print("Médicament non trouvé.")
 
@@ -177,6 +200,9 @@ def mettre_a_jour_medicament():
     prix = input("Entrez le nouveau prix : ")
     quantite_stock = input("Entrez la nouvelle quantité en stock (facultatif) : ")
     id_fournisseur = input("Entrez le nouvel ID du fournisseur : ")
+    if not existe_entite(root, "Fournisseur", "ID_Fournisseur", id_fournisseur):
+        print(f"Le fournisseur avec l'ID {id_fournisseur} n'existe pas.")
+        return
     medicament.set("Nom_Medicament", nom_medicament)
     medicament.set("Prix", prix)
     medicament.set("Quantite_Stock", quantite_stock)
@@ -184,16 +210,23 @@ def mettre_a_jour_medicament():
     sauvegarder_donnees(tree)
     print("Médicament mis à jour avec succès !")
 
+
 # === Gestion des Commandes ===
 def ajouter_commande():
     tree, root = charger_donnees()
     id_commande = input("Entrez l'ID de la commande : ")
-    if existe_entite(root, "Commande", "ID_Commande", id_commande):
+    if existe_entite(root, "Commande", "ID_Commande", id_commande) is not None:
         print("Une commande avec cet ID existe déjà.")
         return
     date_commande = input("Entrez la date de la commande : ")
     id_client = input("Entrez l'ID du client : ")
+    if existe_entite(root, "Client", "ID_Client", id_client) is None:
+        print(f"Le client avec l'ID {id_client} n'existe pas.")
+        return
     id_medicament = input("Entrez l'ID du médicament : ")
+    if existe_entite(root, "Medicament", "ID_Medicament", id_medicament) is None:
+        print(f"Le médicament avec l'ID {id_medicament} n'existe pas.")
+        return
     ET.SubElement(root, "Commande", {
         "ID_Commande": id_commande,
         "Date": date_commande,
@@ -202,6 +235,7 @@ def ajouter_commande():
     })
     sauvegarder_donnees(tree)
     print("Commande ajoutée avec succès !")
+
     
 def afficher_commandes():
     _, root = charger_donnees()
@@ -212,7 +246,6 @@ def afficher_commandes():
 def supprimer_commande():
     tree, root = charger_donnees()
     id_commande = input("Entrez l'ID de la commande à supprimer : ")
-    # Find the commande element
     commande_to_remove = None
     for commande in root.findall("Commande"):
         if commande.get("ID_Commande") == id_commande:
@@ -229,21 +262,32 @@ def supprimer_commande():
 def mettre_a_jour_commande():
     tree, root = charger_donnees()
     id_commande = input("Entrez l'ID de la commande à mettre à jour : ")
-    commande = existe_entite(root, "Commande", "ID_Commande", id_commande)
+    commande = next((cmd for cmd in root.findall("Commande") if cmd.get("ID_Commande") == id_commande), None)
     if commande is None:
         print("Commande non trouvée.")
         return
-    date_commande = input("Entrez la nouvelle date de la commande : ")
+
     id_client = input("Entrez le nouvel ID du client : ")
+    if existe_entite(root, "Client", "ID_Client", id_client) is None:
+        print("Le client avec cet ID n'existe pas. Veuillez vérifier l'ID.")
+        return
+
     id_medicament = input("Entrez le nouvel ID du médicament : ")
+    if not existe_entite(root, "Medicament", "ID_Medicament", id_medicament):
+        print("Le médicament avec cet ID n'existe pas. Veuillez vérifier l'ID.")
+        return
+
+    date_commande = input("Entrez la nouvelle date de la commande : ")
     commande.set("Date", date_commande)
     commande.set("ID_Client", id_client)
     commande.set("ID_Medicament", id_medicament)
     sauvegarder_donnees(tree)
     print("Commande mise à jour avec succès !")
 
+
 # === Menu principal ===
 def menu():
+    init_xml_file(FILENAME)
     while True:
         print("\n=== Menu Gestion de Pharmacie ===")
         print("1. Gérer les clients")
@@ -268,6 +312,7 @@ def menu():
 
 # === Sous-menus ===
 def sous_menu_clients():
+    
     while True:
         print("\n=== Gestion des Clients ===")
         print("1. Ajouter un client")
