@@ -2,4 +2,4 @@
 <?xml-stylesheet type="text/xsl" href="pharmacie.xsl"?>
 <pharmacie>
     
-<Commande ID_Commande="2" Date="30/11/0" ID_Client="1" ID_Medicament="2" /><Commande ID_Commande="2" Date="30/11/2001" ID_Client="5" ID_Medicament="1" /><Client ID_Client="2" Nom_Client="aya" Telephone="5431" /><Client ID_Client="1" Nom_Client="jamila" Telephone="468545" /><Fournisseur ID_Fournisseur="5" Nom_Fournisseur="ahmed" Telephone="54534" /><Fournisseur ID_Fournisseur="aisa" Nom_Fournisseur="omar" Telephone="75" /><Medicament ID_Medicament="1" Nom_Medicament="paracitamol" Prix="30dh" Quantite_Stock="2" ID_Fournisseur="1" /><Commande ID_Commande="2" Date="20/11/02" ID_Client="1" ID_Medicament="5" /><Client ID_Client="4" Nom_Client="jk" Telephone="jk" /><Client ID_Client="5" Nom_Client="hayat" Telephone="514" /><Client ID_Client="10" Nom_Client="houriya" Telephone="12545" /></pharmacie>
+<Client ID_Client="2" Nom_Client="AYA" Telephone="06587861" /><Client ID_Client="3" Nom_Client="alae" Telephone="07545154984" /><Fournisseur ID_Fournisseur="1" Nom_Fournisseur="AYA" Telephone="067884" Nom_Medicament="cédol" Prix="30dh" Quantite_Stock="2" /></pharmacie>

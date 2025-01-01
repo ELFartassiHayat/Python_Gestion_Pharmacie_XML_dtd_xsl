@@ -200,7 +200,8 @@ def mettre_a_jour_medicament():
     prix = input("Entrez le nouveau prix : ")
     quantite_stock = input("Entrez la nouvelle quantité en stock (facultatif) : ")
     id_fournisseur = input("Entrez le nouvel ID du fournisseur : ")
-    if not existe_entite(root, "Fournisseur", "ID_Fournisseur", id_fournisseur):
+    fornis = existe_entite(root, "Fournisseur", "ID_Fournisseur", id_fournisseur)
+    if fornis is None:
         print(f"Le fournisseur avec l'ID {id_fournisseur} n'existe pas.")
         return
     medicament.set("Nom_Medicament", nom_medicament)
@@ -273,7 +274,7 @@ def mettre_a_jour_commande():
         return
 
     id_medicament = input("Entrez le nouvel ID du médicament : ")
-    if not existe_entite(root, "Medicament", "ID_Medicament", id_medicament):
+    if  existe_entite(root, "Medicament", "ID_Medicament", id_medicament) is None:
         print("Le médicament avec cet ID n'existe pas. Veuillez vérifier l'ID.")
         return
 
